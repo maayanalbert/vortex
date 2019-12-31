@@ -5,13 +5,13 @@
 
 
 //creates a variable for the number of hexagons
-var nHexagons = 100;
+var nHexagons = 300;
 
 //creates a variable for the size of the angles in each hexagon
 var hexagonDegree = 60;
 
 //creates a variable for the lengh of each hexagon's sides
-var hexagonSideLength = 6;
+var hexagonSideLength = 10;
 
 //creates a variable for the number of sides on each hexigon
 var hexagonNumberOfSides = 6;
@@ -19,34 +19,44 @@ var hexagonNumberOfSides = 6;
 //creates a variable to represent the value of the golden angle
 var goldenAngle = 137.507764;
 
-var maxDistanceFromCenter = 1026
-var minDistanceFromCenter = 641
-
-var minWeight = 10
-var maxWeight = 3000
-
 //creates a variable to signify relative distance of mouse from center
 //of canvas
-var distanceFromCenter = minDistanceFromCenter
-
-// var color1 = [135, 136, 219]
-// var color2 = [71, 41, 161]
-
-var color1 = [135, 216, 240]
-var color2 = [19, 110, 253]
+var mouseDistanceFromCenter;
 
 function setup() {
-  createCanvas(800, 800);  
+  createCanvas(710, 500);  
 }
 
 function draw() {
-  updateDistanceFromCenter()
+  translate(width*.1, height*.1)
+  scale(.8, .8)
+
+  ///Changes definition of mouseDistanceFromCenter for each quadrant.
+  //This ensures that it is smalllest in the center of the canvas as 
+  //opposed to the upper left corner.
+  if(mouseX < width / 2 && mouseY < height / 2){
+
+  //takes the hypotenuse of the triangle created by mouseX and mouseY to 
+  //find mouseDistanceFromCenter
+  mouseDistanceFromCenter = sqrt((width - mouseX) * (width - mouseX) + 
+    (height - mouseY) * (height - mouseY));
+
+  }else if(mouseX > width / 2 && mouseY < height / 2){
+    mouseDistanceFromCenter = sqrt(mouseX * mouseX + 
+      (height - mouseY) * (height - mouseY));
+  }else if(mouseX > width / 2 && mouseY > height / 2){
+    mouseDistanceFromCenter = sqrt(mouseX * mouseX + mouseY * mouseY);
+  }else{
+    mouseDistanceFromCenter = sqrt((width - mouseX) * 
+      (width - mouseX) + mouseY * mouseY);
+  }
+  
+  mouseDistanceFromCenter *= 1.3
+  
 
   //calculates the space between the first two hexagons based on the 
   //mouse's relative distance from the center of the canvas
-  var spaceBetweenHexagons = 
-    Math.pow(distanceFromCenter, 6) / Math.pow(10, 16);
-
+  var spaceBetweenHexagons = min(Math.pow(mouseDistanceFromCenter, 6) / Math.pow(10, 16), 50)
   //calculates the position of the first hexagon based on a scaled 
   //version of the space between hexagons
   var xCoordinateForFirstHexagon = spaceBetweenHexagons * 2.9;
@@ -64,45 +74,25 @@ function draw() {
 
   //creates a new turtle
   var turtle = new Turtle(xCoordinateForFirstHexagon * .75, 0);
+  
 
   //thickens turtle's line weight to create the appearance of solid 
   //shapes
+  turtle.setWeight(17);
   
   //repeats turtle movement to the location of the next hexagon 
   for(i = 0; i < nHexagons; i++){
-
-    // creates color gradient for hexagons
-    conversionUnit =  (i/ nHexagons)
-
-    currentColor = [(color1[0] * conversionUnit) + (color2[0] * (1 - conversionUnit)),
-                    (color1[1] * conversionUnit) + (color2[1] * (1 - conversionUnit)),
-                    (color1[2] * conversionUnit) + (color2[2] * (1 - conversionUnit))]
-
-    turtle.setColor(currentColor[0], currentColor[1], currentColor[2]);
+    
+    //creates color gradient for hexagons
+    turtle.setColor( i * (255 / nHexagons));
 
     
     //tells turtle to start drawing
     turtle.penDown();
 
-
-    conversionUnitSize = (conversionUnit * 1/(spaceBetweenHexagons*.1))
-    turtleSize = hexagonSideLength * conversionUnitSize/5
-    turtleWeight = map(conversionUnitSize, 0, 200, minWeight, maxWeight)
-    // if(turtleWeight < minWeight){
-    //   turtleWeight = minWeight
-    // }
-
-    turtle.setWeight(turtleWeight);
-
-
     //draws 6 sides for each hexagon
     for(j = 0; j < hexagonNumberOfSides; j++){
-      // turtleSize = hexagonSideLength
-      // minSize = hexagonSideLength
-      // if(turtleSize < minSize){
-      //   turtleSize = minSize
-      // }
-      turtle.forward(turtleSize);
+      turtle.forward(hexagonSideLength);
       turtle.left(hexagonDegree);
     }
 
@@ -112,32 +102,68 @@ function draw() {
 
     //moves turtle by a slightly larger distance for each hexagon
     turtle.left(goldenAngle);
-    turtle.forward(2 *(spaceBetweenHexagons + i / 5));
+    turtle.forward(2 *(spaceBetweenHexagons + i/ 5));
     turtle.right(90);
     turtle.forward(20);
   }
-  pop(); 
+  pop();  
 }
 
-function updateDistanceFromCenter() {
+// function hexagon(x, y){
 
-  if(distanceFromCenter <= minDistanceFromCenter + 75){
-    growing = true
-  }else if((round(distanceFromCenter) >= maxDistanceFromCenter - 5)){
-    growing = false
-  }
+//  var turtle = new Turtle(x, y);
 
-  if(growing == true){
-    speed = .95
-    target = maxDistanceFromCenter
-  }else if(growing == false){
-    speed = .98 
-    target = minDistanceFromCenter
-  }
-  distanceFromCenter = speed*distanceFromCenter + (1-speed)*target
-}
+//  var hexagonDegree = 60;
+//  var hexagonSideLength = 10;
+//  var hexagonNumberOfSides = 6;
 
-//turtle graphics curtesy of Golan Levin
+//  turtle.penDown();
+//  for(i = 0; i < hexagonNumberOfSides; i++){
+//    turtle.forward(hexagonSideLength);
+//    turtle.left(hexagonDegree);
+//  }
+//  turtle.penUp();
+
+// }
+
+
+
+// var turtle = new Turtle(x, y); // make a turtle at x, y, facing right, pen down
+// turtle.left(d);                // turn left by d degrees
+// turtle.right(d)                // turn right by d degrees
+// turtle.forward(p);             // move forward by p pixels
+// turtle.back(p);                // move back by p pixels
+// turtle.penDown();              // pen down
+// turtle.penUp();                // pen up
+// turtle.goto(x, y);             // go straight to this location
+// turtle.setColor(color);        // set the drawing color
+// turtle.setColor(color(r,g,b)); // can be used to set color with r, g, b, values
+// turtle.setWeight(w)            // set the line width to w
+// turtle.face(d);                // turn to this absolute direction in degrees
+// turtle.angleTo(x, y);          // what is the angle from my heading to location x, y?
+// turtle.turnToward(x, y, d);    // turn by d degrees toward location x, y
+// turtle.distanceTo(x, y);       // how far is it to location x, y?
+
+
+//=======================================================
+// TURTLE GRAPHICS IMPLEMENTATION
+// Roger Dannenberg, 2015
+//
+// Turtle(x, y) -- make a turtle at x, y, facing right, pen down
+// left(d) -- turn left by d degrees
+// right(d) -- turn right by d degrees
+// forward(p) -- move forward by p pixels
+// back(p) -- move back by p pixels
+// penDown() -- pen down
+// penUp() -- pen up
+// goto(x, y) -- go straight to this location
+// setColor(color) -- set the drawing color
+// setWeight(w) -- set line width to w
+// face(d) -- turn to this absolute direction in degrees
+// angleTo(x, y) -- what is the angle from my heading to location x, y?
+// turnToward(x, y, d) -- turn by d degrees toward location x, y
+// distanceTo(x, y) -- how far is it to location x, y?
+//
 function Turtle(x, y) {
   this.x = x;
   this.y = y;
@@ -192,9 +218,8 @@ function Turtle(x, y) {
       this.angle -= d;
     }
   };
-  this.setColor = function(c0, c1, c2) {
-    this.color = color(c0, c1, c2);
-    // this.color = 0
+  this.setColor = function(c) {
+    this.color = c;
   };
   this.setWeight = function(w) {
     this.weight = w;
